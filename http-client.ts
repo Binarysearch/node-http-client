@@ -17,7 +17,7 @@ export class HttpClient {
                 method: 'GET'
             }, res => {
                 res.on('data', d => {
-                    
+
                     try {
                         if (res.statusCode === 200) {
                             responseData.push(d);
@@ -46,7 +46,6 @@ export class HttpClient {
 
     public post<T>(options: { host: string; port: number; path: string; body?: any; }): Promise<T> {
         return new Promise((resolve, reject) => {
-
             const data = JSON.stringify(options.body);
 
             const length = options.body ? Buffer.byteLength(data, 'utf8') : 0;
@@ -73,6 +72,18 @@ export class HttpClient {
                     } catch (error) {
                         reject(error);
                     }
+                });
+                res.on('end', () => {
+                    const readed = responseData.read();
+
+                    if (readed) {
+                        resolve(JSON.parse(readed.toString()));
+
+                        resolve(readed);
+                    } else {
+                        resolve(<T>null);
+                    }
+
                 });
             });
 
