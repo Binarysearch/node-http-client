@@ -45,7 +45,7 @@ export class HttpClient {
         });
     }
 
-    public post<T>(options: { host: string; port: number; path: string; body?: any; secure?: boolean }): Promise<T> {
+    public post<T>(options: { host: string; port: number; path: string; body?: any; secure?: boolean; authorization?: string; }): Promise<T> {
         return new Promise((resolve, reject) => {
             const data = JSON.stringify(options.body);
 
@@ -53,15 +53,21 @@ export class HttpClient {
 
             let responseData = new Stream();
 
+            const headers = {
+                'Content-Type': 'application/json',
+                'Content-Length': length
+            };
+
+            if (options.authorization) {
+                headers['Authorization'] = options.authorization;
+            }
+
             const req = (options.secure ? https : http).request({
                 hostname: options.host,
                 port: options.port,
                 path: options.path,
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Content-Length': length
-                }
+                headers: headers
             }, res => {
                 res.on('data', d => {
                     try {
