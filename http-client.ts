@@ -1,5 +1,6 @@
 import { Injectable } from "@piros/ioc";
 import * as http from "http";
+import * as https from "https";
 import { Transform as Stream } from "stream";
 
 @Injectable
@@ -44,7 +45,7 @@ export class HttpClient {
         });
     }
 
-    public post<T>(options: { host: string; port: number; path: string; body?: any; }): Promise<T> {
+    public post<T>(options: { host: string; port: number; path: string; body?: any; secure?: boolean }): Promise<T> {
         return new Promise((resolve, reject) => {
             const data = JSON.stringify(options.body);
 
@@ -52,7 +53,7 @@ export class HttpClient {
 
             let responseData = new Stream();
 
-            const req = http.request({
+            const req = (options.secure ? https : http).request({
                 hostname: options.host,
                 port: options.port,
                 path: options.path,
